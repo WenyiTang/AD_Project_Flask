@@ -1,11 +1,14 @@
 from flask import Flask, request, jsonify
 import json
+import ast
+import sys
 import pandas as pd
 import numpy as np
 import pickle
 
 from sklearn.metrics import r2_score
 import recModel
+import WmaModel
 import requests
 
 app = Flask(__name__)
@@ -54,6 +57,22 @@ def getData():
     print(df.head())
     return df
 
+@app.route("/suggestnextmeal", methods = ["POST"])
+def suggestNextMeal() :
+    modelFile = open("wmaModel", "rb")
+    model = pickle.load(modelFile)
+    jsonObject = request.get_json(force=True)
+    jsonString = json.dumps(jsonObject)
+    data = json.loads(jsonString)
+    print(data, file=sys.stdout)
+    targetCount = int(data["targetCount"])
+    trackScore = ast.literal_eval(data["trackScore"])
+    trackScoreDf = pd.DataFrame(trackScore)
+    trackScoreDf.index = trackScoreDf.index + 1
+    result = model.isConsistent(trackScoreDf, targetCount)
+    return result
+
 if __name__ == "__main__":
     recModel.recmodel()
+    WmaModel.wmaModel()
     app.run(debug = True)
