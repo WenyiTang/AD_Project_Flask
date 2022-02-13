@@ -40,7 +40,7 @@ def prepDataBase(data):
             return "offtrack"
     df["track_score"] = df["track_score"].apply(rename_ontrack)
     df_combine = df.copy()
-    df_combine["combine"] = df_combine["title"] + ", " + df_combine["description"] + ", " + df_combine["feeling"]+ ", " + df_combine["track_score"]
+    df_combine["combine"] = df_combine["title"] + ", " + df_combine["description"] + ", " + df_combine["track_score"]+ ", " + df_combine["feeling"]
     df_combine_only = df_combine.loc[:, ["id", "combine"]]
     combine_arr = df_combine_only["combine"].values
     return df, df_combine_only, combine_arr
@@ -106,11 +106,11 @@ def getSimilarity(query_feature_vector, feature_vectors, df, q):
             if (track == q[2]):
                 query_similarity[x] += 0.1
 
-            if ((q[1] != "CRY" or q[1] != "PENSIVE") and feel == q[1]):
+            if ((q[1] != "cry" or q[1] != "pensive") and feel == q[1]):
                 query_similarity[x] += 0.1
-            elif (q[1] == "CRY" and feel == "JOY"):
+            elif (q[1] == "cry" and feel == "joy"):
                 query_similarity[x] += 0.1
-            elif (q[1] == "PENSIVE" and feel == "HAPPY"):
+            elif (q[1] == "pensive" and feel == "happy"):
                 query_similarity[x] += 0.1
 
         series = pd.Series(query_similarity, index=df.index)
