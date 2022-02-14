@@ -21,6 +21,7 @@ def searchQuery() :
     full_query = response.json()
     s = []
     s.append(full_query['input'])
+    #s.append(full_query['input'] + ", " + full_query['track'] + ", " + full_query['feeling'])
     s.append(full_query['feeling'])
     s.append(full_query['track'])
     print(s)
