@@ -95,6 +95,7 @@ def cleanGetQuery(q):
             query_clean[0] = query_clean[0] + " happy joy"
         query_clean[0] = " ".join(query_clean[0].split())
         query = query_clean
+        print(query)
         cleaned.append(query)
         
     return(cleaned[0], cleaned[1])
@@ -150,7 +151,7 @@ def getSimilarity(query_feature_vector_title, feature_vectors_title, query_featu
         if (track == q[2]):
             query_similarity[x] += weight
 
-        if ((q[1] != "cry" or q[1] != "pensive") and feel == q[1]):
+        if ((q[1] != "cry" and q[1] != "pensive") and feel == q[1]):
             query_similarity[x] += weight
         #if user is sad, add more weights to joy and happy entries
         elif (q[1] == "cry" or q[1] == "pensive"):
@@ -181,7 +182,8 @@ def getSimilarity(query_feature_vector_title, feature_vectors_title, query_featu
         sorted_series_out = sorted_series_shuff.head(5).sort_values(ascending=False)
 
     #final check if no keyword input, goodResults is true
-    if (q[0] == ""):
+    print("hello" + preprocess([q[0]])[0] + "hello")
+    if (preprocess([q[0]])[0] == ""):
         goodResults = "true"
 
     #final check if not enough data, goodResults is false

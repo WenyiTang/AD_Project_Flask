@@ -13,22 +13,36 @@ import requests
 
 app = Flask(__name__)
 
-@app.route("/enterquery", methods = ["POST", "GET"])
-def searchQuery() :
-    query_url = "http://localhost:8080/api/recommend/enterquery1"
-    response = requests.get(query_url)
-    print(response.json())
-    full_query = response.json()
-    s = []
-    s.append(full_query['input'])
-    #s.append(full_query['input'] + ", " + full_query['track'] + ", " + full_query['feeling'])
-    s.append(full_query['feeling'])
-    s.append(full_query['track'])
+@app.route("/enterquery/<string:uid>/<string:input>/<string:feeling>/<string:track_score>", methods = ["POST", "GET"])
+def searchQuery(uid, input, feeling, track_score) :
+
+    # userId = str(request.args.get('uid'))
+    # input = str(request.args.get('input'))
+    # feeling = str(request.args.get('feeling'))
+    # track = str(request.args.get('track_score'))
+    #query_url = "http://localhost:8080/api/recommend/enterquery1/" + userId
+    #response = requests.get(query_url)
+    #print(response.json())
+    #full_query = response.json()
+    # s = []
+    # s.append(full_query['input'])
+    # #s.append(full_query['input'] + ", " + full_query['track'] + ", " + full_query['feeling'])
+    # s.append(full_query['feeling'])
+    # s.append(full_query['track'])
+    # print(s)
+    # s = {
+    #     "uid" : uid,
+    #     "input" : input,
+    #     "feeling" : feeling,
+    #     "track_score" : track_score
+    # }
+
+    s = [input, feeling, track_score]
     print(s)
 
     modelFile = open("recmodel", "rb")
     model = pickle.load(modelFile)
-    df = getData()
+    df = getData(uid)
     result = model.search(s, df)
     print(result)
     result_dict = {
@@ -45,8 +59,8 @@ def searchQuery() :
     result_dict["goodResult"] = result[-1]
     return result_dict
 
-def getData():
-    data_url = "http://localhost:8080/api/recommend/passData"
+def getData(userId):
+    data_url = "http://localhost:8080/api/recommend/passData/" + userId
     data_response = requests.get(data_url)
     data = data_response.json()
     df = pd.DataFrame()
@@ -76,4 +90,4 @@ def suggestNextMeal() :
 if __name__ == "__main__":
     recModel.recmodel()
     WmaModel.wmaModel()
-    app.run(debug = True)
+    app.run()
