@@ -182,13 +182,12 @@ def getSimilarity(query_feature_vector_title, feature_vectors_title, query_featu
         sorted_series_out = sorted_series_shuff.head(5).sort_values(ascending=False)
 
     #final check if no keyword input, goodResults is true
-    print("hello" + preprocess([q[0]])[0] + "hello")
     if (preprocess([q[0]])[0] == ""):
         goodResults = "true"
 
     #final check if not enough data, goodResults is false
-    if (len(df) < 30):
-        goodResults = "false"
+    # if (len(df) < 50):
+    #     goodResults = "false"
 
     return sorted_series_out, goodResults
 
