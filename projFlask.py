@@ -90,4 +90,4 @@ def suggestNextMeal() :
 if __name__ == "__main__":
     recModel.recmodel()
     WmaModel.wmaModel()
-    #app.run()
+    app.run()
