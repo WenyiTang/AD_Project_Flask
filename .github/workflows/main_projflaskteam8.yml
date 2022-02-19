@@ -60,4 +60,4 @@ jobs:
         with:
           app-name: 'projFlaskteam8'
           slot-name: 'Production'
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_59F6B975CDE8454CB8799966A970E8AB }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_64E5D8F24AF743D3BF4C91168A351F83 }}
