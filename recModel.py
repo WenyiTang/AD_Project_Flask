@@ -1,9 +1,5 @@
-from dataclasses import dataclass
 import pandas as pd
 import numpy as np
-import tensorflow as tf
-import matplotlib.pyplot as plt
-import seaborn as sb
 import nltk
 import string
 import pickle
@@ -14,6 +10,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 class recModel :
     def __init__(self) : pass
+
     def search(self, q, data):
         df, df_combine_only, combine_arr, title_arr, t_arr = prepDataBase(data)
         docs_combine_clean = cleanData(combine_arr)
@@ -183,78 +180,12 @@ def getSimilarity(query_feature_vector_t, feature_vectors_t,
 
         query_similarity[x] = out
 
-    #case 0 (check if title only is good enough)
-    # if (t_similarity[0].max() > 0.3):
-    #     goodResults = "true"
-    #     query_similarity = t_similarity[0]
-    #     print("word search 0: " + goodResults)
-    #     print(t_similarity[0].max())
-
-    # #case 1 (check if title + desc only is good enough)
-    # if (t_similarity[0].max() > 0.3 or title_similarity[0].max() > 0.3):
-    #     goodResults = "true"
-    #     if (t_similarity[0].max() > 0.3):
-    #         print("title is good")
-    #         query_similarity = 0.5*t_similarity[0] + 0.5*title_similarity[0]
-    #     else:
-    #         print("only desc is good")
-    #         query_similarity = title_similarity[0]
-    #     print("word search 1: " + goodResults)
-    #     query_similarity = query_similarity * 1.5
-    #     print(query_similarity.max())
-        
-    # #case 2 (check if combine is good enough)
-    # elif (combine_similarity[0].max() > 0.3):
-    #     goodResults = "true"
-    #     query_similarity = combine_similarity[0]
-    #     print("word search 2: " + goodResults)
-    #     query_similarity = query_similarity * 1.25
-    #     print(combine_similarity[0].max())
-    
-    # #case 3 (all not enough)
-    # else: 
-    #     goodResults = "false"
-    #     query_similarity = combine_similarity[0]
-    #     print("word search 3: " + goodResults)
-
-    # # query_sim_pass = query_similarity[query_similarity > 0.3]
-    # # query_avg = query_sim_pass.mean()
-    # # print(query_sim_pass)
-    # # print(query_avg)
-    # #max_sim = query_similarity.max()
-    # #print(max_sim)
-    # #weight = query_avg/4
-
-    # print("adding weights")
-    # print(len(query_similarity))
-    # for x in range(len(query_similarity)):
-    #     out = query_similarity[x]
-    #     weight = query_similarity[x]/4
-
-    #     feel = df.loc[x,'feeling'].lower()
-    #     track = df.loc[x,'track_score'].lower()
-    #     if (track == q[2]):
-    #         out += weight
-
-    #     if ((q[1] != "cry" and q[1] != "pensive")):
-    #         out += weight
-    #     #if user is sad, add more weights to joy and happy entries
-    #     if (q[1] == "cry" or q[1] == "pensive"):
-    #         if (feel == "joy"):
-    #             out += (2*weight)
-    #         elif (feel == "happy"):
-    #             out += weight
-
-    #     query_similarity[x] = out
-
     series = pd.Series(query_similarity, index=df.index)
     sorted_series = series.sort_values(ascending=False)
 
-    # if (len(sorted_series[sorted_series > 0.3]) >= 5):
-    #     print("good more than 5")
-    #     goodResults = "true"
     #shuffle top 10 and get 5
     sorted_series_10 = sorted_series[sorted_series > 0.45].head(10)
+    print(sorted_series.head(10))
     if (len(sorted_series_10) == 0):
         goodResults = "false"
         sorted_series_shuff = sorted_series.sample(frac=1)

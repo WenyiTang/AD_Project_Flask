@@ -1,27 +1,66 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request
 import json
 import ast
 import sys
 import pandas as pd
 import numpy as np
 import pickle
+import nltk
 
 from sklearn.metrics import r2_score
-import recModel
 import WmaModel
+import recModel
+import nltkmodules
 import requests
+application = Flask(__name__)
 
-app = Flask(__name__)
+@application.route("/")
+def hello():
+    return "Hello World!"
 
-@app.route("/enterquery/<string:uid>/<string:input>/<string:feeling>/<string:track_score>", methods = ["POST", "GET"])
-def searchQuery(uid, input, feeling, track_score) :
+@application.route("/suggestnextmeal", methods = ["POST"])
+def suggestNextMeal() :
 
-    s = [input, feeling, track_score]
-    print(s)
+    WmaModel.wmaModel()
+    modelFile = open("wmaModel", "rb")
+    model = pickle.load(modelFile)
+    jsonObject = request.get_json(force=True)
+    jsonString = json.dumps(jsonObject)
+    data = json.loads(jsonString)
+    print(data, file=sys.stdout)
+    targetCount = int(data["targetCount"])
+    trackScore = ast.literal_eval(data["trackScore"])
+    trackScoreDf = pd.DataFrame(trackScore)
+    trackScoreDf.index = trackScoreDf.index + 1
+    result = model.isConsistent(trackScoreDf, targetCount)
 
+    return result
+
+@application.route("/getData", methods = ["POST"])
+def getData():
+
+    recModel.recmodel()
     modelFile = open("recmodel", "rb")
     model = pickle.load(modelFile)
-    df = getData(uid)
+
+    jsonObject = request.get_json(force=True)
+    jsonString = json.dumps(jsonObject)
+    data = json.loads(jsonString)
+    id = data["id"]
+    title = data["title"]
+    description = data["description"]
+    feeling = data["feeling"]
+    track_score = data["track_score"]
+    input = data["input"]
+    feel = data["feel"]
+    track = data["track"]
+
+    s = [input, feel, track]
+    #print(s)
+    d = {"id" : id, "title" : title, "description" :description, "feeling" : feeling, "track_score" : track_score}
+    df = pd.DataFrame(data=d)
+    #print(df.head())
+    
     result = model.search(s, df)
     print(result)
     result_dict = {
@@ -36,36 +75,8 @@ def searchQuery(uid, input, feeling, track_score) :
         index = "res" + str(x)
         result_dict[index] = int(result[x])
     result_dict["goodResult"] = result[-1]
+
     return result_dict
 
-def getData(userId):
-    data_url = "http://localhost:8080/api/recommend/passData/" + userId
-    data_response = requests.get(data_url)
-    data = data_response.json()
-    df = pd.DataFrame()
-    df['id'] = data['id']
-    df['title'] = data['title']
-    df['description'] = data['description']
-    df['feeling'] = data['feeling']
-    df['track_score'] = data['track_score']
-    return df
-
-@app.route("/suggestnextmeal", methods = ["POST"])
-def suggestNextMeal() :
-    modelFile = open("wmaModel", "rb")
-    model = pickle.load(modelFile)
-    jsonObject = request.get_json(force=True)
-    jsonString = json.dumps(jsonObject)
-    data = json.loads(jsonString)
-    print(data, file=sys.stdout)
-    targetCount = int(data["targetCount"])
-    trackScore = ast.literal_eval(data["trackScore"])
-    trackScoreDf = pd.DataFrame(trackScore)
-    trackScoreDf.index = trackScoreDf.index + 1
-    result = model.isConsistent(trackScoreDf, targetCount)
-    return result
-
 if __name__ == "__main__":
-    recModel.recmodel()
-    WmaModel.wmaModel()
-    app.run()
+    application.run()
