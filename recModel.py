@@ -136,9 +136,6 @@ def getSimilarity(query_feature_vector_t, feature_vectors_t,
     t_similarity = np.array(cosine_similarity(query_feature_vector_t, feature_vectors_t))
     title_similarity = np.array(cosine_similarity(query_feature_vector_title, feature_vectors_title))
     combine_similarity = np.array(cosine_similarity(query_feature_vector_combine, feature_vectors_combine))
-    print(len(t_similarity[0]))
-    print(len(title_similarity[0]))
-    print(len(combine_similarity[0]))
 
     t_similarity_arr = t_similarity[0]
     title_similarirty_arr = title_similarity[0]
@@ -146,15 +143,20 @@ def getSimilarity(query_feature_vector_t, feature_vectors_t,
 
     query_similarity = t_similarity[0]
     goodResults = "false"
+    titleMatch = "false"
 
     for x in range(len(t_similarity[0])):
         #title and/or desc good enough
         if (t_similarity_arr[x] > 0.3 or title_similarirty_arr[x] > 0.3):
-            if (t_similarity_arr[x] > 0.3):
+            if (t_similarity_arr[x] > 0.8):
+                query_similarity[x] = t_similarity_arr[x]
+                titleMatch = "true"
+            elif (t_similarity_arr[x] > 0.3):
                 query_similarity[x] = 0.5*t_similarity_arr[x] + 0.5*title_similarirty_arr[x]
             else:
                 query_similarity[x] = title_similarirty_arr[x]
-            query_similarity[x] *= 1.5
+            if (titleMatch == "false"):
+                query_similarity[x] *= 1.5
         elif (combine_similarity_arr[x] > 0.3):
             query_similarity[x] = combine_similarity_arr[x]
         else: 
@@ -253,7 +255,6 @@ def getSimilarity(query_feature_vector_t, feature_vectors_t,
     #     goodResults = "true"
     #shuffle top 10 and get 5
     sorted_series_10 = sorted_series[sorted_series > 0.45].head(10)
-    print(sorted_series.head(10))
     if (len(sorted_series_10) == 0):
         goodResults = "false"
         sorted_series_shuff = sorted_series.sample(frac=1)
@@ -272,10 +273,6 @@ def getSimilarity(query_feature_vector_t, feature_vectors_t,
     #final check if no keyword input, goodResults is true
     if (preprocess([q[0]])[0] == ""):
         goodResults = "true"
-
-    #final check if not enough data, goodResults is false
-    if (len(df) < 50):
-        goodResults = "false"
 
     return sorted_series_out, goodResults
 
